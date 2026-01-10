@@ -1,0 +1,28 @@
+import arcade
+
+from pyglet.graphics import Batch
+
+
+class PauseView(arcade.View):
+    def __init__(self, game_view):
+        super().__init__()
+        self.background_color = (25, 20, 43)
+        self.game_view = game_view
+        self.batch = Batch()
+        self.pause_text = arcade.Text("Пауза", self.window.width / 2, self.window.height / 2,
+                                      arcade.color.WHITE, font_size=40, anchor_x="center", batch=self.batch)
+        self.space_text = arcade.Text("Нажми SPACE, чтобы продолжить", self.window.width / 2,
+                                      self.window.height / 2 - 50,
+                                      arcade.color.WHITE, font_size=20, anchor_x="center", batch=self.batch)
+
+    def on_draw(self):
+        self.clear()
+        self.game_view.on_draw()
+        arcade.draw_lbwh_rectangle_filled(0, 0, self.window.width, self.window.height, (0, 0, 0, 100))
+        self.batch.draw()
+
+    def on_key_press(self, key, modifiers):
+        if key == arcade.key.SPACE:
+            self.window.show_view(self.game_view)
+        if key == arcade.key.ESCAPE:
+            self.window.show_view(self.game_view.menu_view)
