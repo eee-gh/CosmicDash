@@ -25,4 +25,4 @@ class PauseView(arcade.View):
         if key == arcade.key.SPACE:
             self.window.show_view(self.game_view)
         if key == arcade.key.ESCAPE:
-            self.window.show_view(self.game_view.menu_view)
+            self.window.show_view(self.window.view_dict['menu_view'])
