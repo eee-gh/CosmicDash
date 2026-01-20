@@ -27,6 +27,14 @@ class Ship(arcade.Sprite):
         self.center_x = max(self.width // 2, min(self.center_x, self.screen_wight - self.width // 2))
         self.center_y = max(self.height // 2, min(self.center_y, self.screen_height - self.height // 2))
 
+    def dash(self, end_x, end_y, dst):
+        angle = math.atan2(end_y - self.center_y, end_x - self.center_x)
+        dx = math.cos(angle)
+        dy = math.sin(angle)
+        angle = math.degrees(-angle)
+        self.center_x += self.speed * dx
+        self.center_y += self.speed * dy
+
 
 class Bullet(arcade.Sprite):
     def __init__(self, start_x, start_y, end_x, end_y, speed, sw, sh):

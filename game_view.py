@@ -13,6 +13,12 @@ class GameView(arcade.View):
         self.bullets_list = arcade.SpriteList()
         self.ship = Ship(self.window.width / 2, self.window.height / 5, 250, self.window.width, self.window.height)
         self.player_list.append(self.ship)
+        self.can_shoot = True
+        self.shoot_cooldown = 0.4
+        self.dash_distance = 65
+        self.can_dash = True
+        self.dash_cooldown = 1
+        self.emitters = []
 
     def on_draw(self):
         self.clear()
@@ -28,6 +34,13 @@ class GameView(arcade.View):
             if star.center_y < -5:
                 star.center_y = self.window.height + 5
 
+        emitters_copy = self.emitters.copy()
+        for e in emitters_copy:
+            e.update(delta_time)
+        for e in emitters_copy:
+            if e.can_reap():
+                self.emitters.remove(e)
+
     def on_key_press(self, key, modifiers):
         self.keys_pressed.add(key)
         if key == arcade.key.ESCAPE:
@@ -39,6 +52,21 @@ class GameView(arcade.View):
             self.keys_pressed.remove(key)
 
     def on_mouse_press(self, x, y, button, modifiers):
-        if button == arcade.MOUSE_BUTTON_LEFT:
+        if button == arcade.MOUSE_BUTTON_LEFT and self.can_shoot:
             self.bullets_list.append(Bullet(self.ship.center_x, self.ship.center_y, x, y, 650,
                                             self.window.width, self.window.height))
+            self.can_shoot = False
+            arcade.schedule(self.weapon_ready, self.shoot_cooldown)
+
+        if button == arcade.MOUSE_BUTTON_RIGHT and self.can_dash:
+            self.ship.dash(x, y, self.dash_distance)
+            self.can_dash = False
+            arcade.schedule(self.dash_ready, self.dash_cooldown)
+
+    def weapon_ready(self, delta_time):
+        self.can_shoot = True
+        arcade.unschedule(self.weapon_ready)
+
+    def dash_ready(self, delta_time):
+        self.can_dash = True
+        arcade.unschedule(self.dash_ready)
