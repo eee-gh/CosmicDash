@@ -15,9 +15,11 @@ class GameView(arcade.View):
         self.player_list.append(self.ship)
         self.can_shoot = True
         self.shoot_cooldown = 0.4
-        self.dash_distance = 65
-        self.can_dash = True
-        self.dash_cooldown = 1
+        self.is_dashing = False
+        self.dash_cooldown = 100
+        self.dash_use_cd = 0.01
+        self.dash_refill_cd = 0.05
+        arcade.schedule(self.dash_refill, self.dash_refill_cd)
         self.emitters = []
 
     def on_draw(self):
@@ -27,7 +29,12 @@ class GameView(arcade.View):
         self.player_list.draw()
 
     def on_update(self, delta_time):
-        self.player_list.update(delta_time, self.keys_pressed)
+        if self.dash_cooldown <= 0:
+            self.is_dashing = False
+            self.dash_cooldown = 0
+            arcade.unschedule(self.dash_use)
+
+        self.player_list.update(delta_time, self.keys_pressed, self.is_dashing)
         self.bullets_list.update(delta_time)
         for star in self.star_list:
             star.center_y -= 10 * delta_time
@@ -58,15 +65,23 @@ class GameView(arcade.View):
             self.can_shoot = False
             arcade.schedule(self.weapon_ready, self.shoot_cooldown)
 
-        if button == arcade.MOUSE_BUTTON_RIGHT and self.can_dash:
-            self.ship.dash(x, y, self.dash_distance)
-            self.can_dash = False
-            arcade.schedule(self.dash_ready, self.dash_cooldown)
+        if button == arcade.MOUSE_BUTTON_RIGHT:
+            self.is_dashing = True
+            arcade.schedule(self.dash_use, self.dash_use_cd)
+
+    def on_mouse_release(self, x, y, button, modifiers):
+        if button == arcade.MOUSE_BUTTON_RIGHT:
+            self.is_dashing = False
+            arcade.unschedule(self.dash_use)
 
     def weapon_ready(self, delta_time):
         self.can_shoot = True
         arcade.unschedule(self.weapon_ready)
 
-    def dash_ready(self, delta_time):
-        self.can_dash = True
-        arcade.unschedule(self.dash_ready)
+    def dash_use(self, delta_time):
+        if self.dash_cooldown > 0:
+            self.dash_cooldown -= 1
+
+    def dash_refill(self, delta_time):
+        if self.dash_cooldown < 100:
+            self.dash_cooldown += 1
