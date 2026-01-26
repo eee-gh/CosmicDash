@@ -14,10 +14,10 @@ class MenuView(arcade.View):
         self.update_stars()
 
         self.batch = Batch()
-        self.main_text = arcade.Text("CosmicDash", self.window.width / 2, self.window.height / 2 + 100,
-                                     arcade.color.RED, font_size=60, anchor_x="center", bold=True, batch=self.batch)
+        self.main_text = arcade.Text('CosmicDash', self.window.width / 2, self.window.height / 2 + 100,
+                                     arcade.color.RED, font_size=60, anchor_x='center', bold=True, batch=self.batch)
         self.start_text = arcade.Text('Start', self.window.width / 2, self.window.height / 2 - 20,
-                                      arcade.color.RED, font_size=40, anchor_x="center", batch=self.batch)
+                                      arcade.color.RED, font_size=40, anchor_x='center', batch=self.batch)
 
     def on_draw(self):
         self.clear()

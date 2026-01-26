@@ -1,6 +1,10 @@
+import random
+
 import arcade
 
+from pyglet.graphics import Batch
 from player import Ship, Bullet
+from projectiles import ProjectileA
 
 
 class GameView(arcade.View):
@@ -11,6 +15,7 @@ class GameView(arcade.View):
         self.keys_pressed = set()
         self.player_list = arcade.SpriteList()
         self.bullets_list = arcade.SpriteList()
+        self.projectile_list = arcade.SpriteList()
         self.ship = Ship(self.window.width / 2, self.window.height / 5, 250, self.window.width, self.window.height)
         self.player_list.append(self.ship)
         self.can_shoot = True
@@ -20,13 +25,27 @@ class GameView(arcade.View):
         self.dash_use_cd = 0.01
         self.dash_refill_cd = 0.05
         arcade.schedule(self.dash_refill, self.dash_refill_cd)
+        self.projectile_cd = 0.1
+        self.projectile_amo = 1
+        arcade.schedule(self.spawn_projectiles, self.projectile_cd)
         self.emitters = []
+
+        self.batch = Batch()
+        self.dash_cd = arcade.Text(str(self.dash_cooldown // 10 * 10), 0, self.window.height,
+                                   arcade.color.RED, font_size=60, anchor_x='left', anchor_y='top',
+                                   bold=True, batch=self.batch)
 
     def on_draw(self):
         self.clear()
         self.star_list.draw()
+        self.projectile_list.draw()
+
         self.bullets_list.draw()
         self.player_list.draw()
+        self.dash_cd = arcade.Text(str(self.dash_cooldown // 10 * 10), 0, self.window.height,
+                                   arcade.color.RED, font_size=60, anchor_x='left', anchor_y='top',
+                                   bold=True, batch=self.batch)
+        self.batch.draw()
 
     def on_update(self, delta_time):
         if self.dash_cooldown <= 0:
@@ -36,6 +55,7 @@ class GameView(arcade.View):
 
         self.player_list.update(delta_time, self.keys_pressed, self.is_dashing)
         self.bullets_list.update(delta_time)
+        self.projectile_list.update(delta_time)
         for star in self.star_list:
             star.center_y -= 10 * delta_time
             if star.center_y < -5:
@@ -85,3 +105,9 @@ class GameView(arcade.View):
     def dash_refill(self, delta_time):
         if self.dash_cooldown < 100:
             self.dash_cooldown += 1
+
+    def spawn_projectiles(self, delta_time):
+        for i in range(self.projectile_amo):
+            projectile = ProjectileA(random.randint(-200, self.window.width + 200), self.window.height + 200,
+                                     self.ship.center_x, self.ship.center_y, 150, self.window.width, self.window.height)
+            self.projectile_list.append(projectile)
