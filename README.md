@@ -42,3 +42,5 @@ CosmicDash
 Помимо python файлов, папка игры содержит в себе папку со спрайтами.
 ### Описание технологий
 Данный проект использует библиотеку Arcade и её основные классы, SQLite3 для работы с БД.
+
+# [Презентация](https://docs.google.com/presentation/d/1YQajXh3StmTtdRJjjvAF2csi2q-iTWLI/edit?usp=drive_link&ouid=113776999526641735703&rtpof=true&sd=true)
