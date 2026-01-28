@@ -4,7 +4,10 @@ import math
 
 class Ship(arcade.Sprite):
     def __init__(self, x, y, speed, sw, sh):
-        super().__init__('sprites/ship.png', scale=1)
+        self.m_texture = arcade.load_texture('sprites/ship.png')
+        self.r_texture = arcade.load_texture('sprites/ship_r.png')
+        self.l_texture = arcade.load_texture('sprites/ship_l.png')
+        super().__init__(self.m_texture, scale=1.5)
         self.center_x = x
         self.center_y = y
         self.speed = speed
@@ -29,11 +32,17 @@ class Ship(arcade.Sprite):
         self.center_y += speed * delta_time * dy
         self.center_x = max(self.width // 2, min(self.center_x, self.screen_wight - self.width // 2))
         self.center_y = max(self.height // 2, min(self.center_y, self.screen_height - self.height // 2))
+        if dx > 0:
+            self.texture = self.r_texture
+        if dx < 0:
+            self.texture = self.l_texture
+        if dx == 0:
+            self.texture = self.m_texture
 
 
 class Bullet(arcade.Sprite):
     def __init__(self, start_x, start_y, end_x, end_y, speed, sw, sh):
-        super().__init__('sprites/bullet.png')
+        super().__init__('sprites/bullet.png', scale=1.5)
         self.center_x = start_x
         self.center_y = start_y
         self.end_x = end_x
@@ -44,10 +53,18 @@ class Bullet(arcade.Sprite):
         self.angle = math.atan2(self.end_y - self.center_y, self.end_x - self.center_x)
         self.dx = math.cos(self.angle)
         self.dy = math.sin(self.angle)
-        self.angle = math.degrees(-self.angle)
+        self.angle = math.degrees(-self.angle + 0.5 * math.pi)
 
     def update(self, delta_time):
         self.center_x += self.speed * delta_time * self.dx
         self.center_y += self.speed * delta_time * self.dy
         if not (0 < self.center_x < self.screen_wight and 0 < self.center_y < self.screen_height):
             self.remove_from_sprite_lists()
+
+
+class ShipHitbox(arcade.Sprite):
+    def __init__(self, x, y):
+        texture = arcade.make_soft_square_texture(30, arcade.color.BLUE, 255)
+        super().__init__(texture)
+        self.center_x = x
+        self.center_y = y
