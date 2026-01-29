@@ -7,6 +7,7 @@ class Ship(arcade.Sprite):
         self.m_texture = arcade.load_texture('sprites/ship.png')
         self.r_texture = arcade.load_texture('sprites/ship_r.png')
         self.l_texture = arcade.load_texture('sprites/ship_l.png')
+        self.boom_texture = arcade.load_texture('sprites/boom.png')
         super().__init__(self.m_texture, scale=1.5)
         self.center_x = x
         self.center_y = y
@@ -15,8 +16,14 @@ class Ship(arcade.Sprite):
         self.screen_height = sh
         self.speed_x = 0
         self.speed_y = 0
+        self.dead = False
 
     def update(self, delta_time, keys, dash=False):
+        if self.dead:
+            self.texture = self.boom_texture
+            self.scale = 2
+            return
+
         dx, dy = 0, 0
         if arcade.key.W in keys: dy += 1
         if arcade.key.S in keys: dy -= 1
@@ -65,6 +72,14 @@ class Bullet(arcade.Sprite):
 class ShipHitbox(arcade.Sprite):
     def __init__(self, x, y):
         texture = arcade.make_soft_square_texture(30, arcade.color.BLUE, 255)
+        super().__init__(texture)
+        self.center_x = x
+        self.center_y = y
+
+
+class Shield(arcade.Sprite):
+    def __init__(self, x, y):
+        texture = arcade.make_soft_circle_texture(110, arcade.color.BLUE, 255)
         super().__init__(texture)
         self.center_x = x
         self.center_y = y

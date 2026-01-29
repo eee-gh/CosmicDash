@@ -23,6 +23,7 @@ class PauseView(arcade.View):
 
     def on_key_press(self, key, modifiers):
         if key == arcade.key.SPACE:
+            self.game_view.paused = False
             self.window.show_view(self.game_view)
         if key == arcade.key.ESCAPE:
             menu_view = self.window.view_dict['menu_view']()

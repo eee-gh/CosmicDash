@@ -1,10 +1,11 @@
 import arcade
 
-from menu_view import MenuView
-from game_view import GameView
-from pause_view import PauseView
+from views.menu_view import MenuView
+from views.game_view import GameView
+from views.pause_view import PauseView
+from views.end_view import EndView
 
-views = {'menu_view': MenuView, 'game_view': GameView, 'pause_view': PauseView}
+views = {'menu_view': MenuView, 'game_view': GameView, 'pause_view': PauseView, 'end_view': EndView}
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 800

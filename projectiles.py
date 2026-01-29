@@ -21,7 +21,8 @@ class ProjectileA(arcade.Sprite):
     def update(self, delta_time):
         self.center_x += self.speed * delta_time * self.dx
         self.center_y += self.speed * delta_time * self.dy
-        if self.center_x < -200:
+        if (self.center_x < -200 or self.center_y < -200 or
+                self.center_x > self.screen_wight + 200 or self.center_y > self.screen_height + 200):
             self.remove_from_sprite_lists()
 
 
@@ -44,5 +45,6 @@ class ProjectileB(arcade.Sprite):
     def update(self, delta_time):
         self.center_x += self.speed * delta_time * self.dx
         self.center_y += self.speed * delta_time * self.dy
-        if self.center_x < -200:
+        if (self.center_x < -200 or self.center_y < -200 or
+                self.center_x > self.screen_wight + 200 or self.center_y > self.screen_height + 200):
             self.remove_from_sprite_lists()
