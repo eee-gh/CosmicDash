@@ -22,6 +22,9 @@ class GameView(arcade.View):
         self.ship_hitbox = ShipHitbox(self.ship.center_x, self.ship.center_y)
         self.shield = Shield(self.ship.center_x, self.ship.center_y)
         self.player_list.append(self.ship)
+        self.pew_sound = arcade.load_sound('sounds/pew.wav')
+        self.boom_sound = arcade.load_sound('sounds/boom.wav')
+        self.hit_sound = arcade.load_sound('sounds/hit.wav')
 
         self.time = 0
         self.score = 0
@@ -117,6 +120,7 @@ class GameView(arcade.View):
         for bullet in self.bullets_list:
             projectiles_hit_list = arcade.check_for_collision_with_list(bullet, self.projectile_list_b)
             if projectiles_hit_list:
+                arcade.play_sound(self.boom_sound, volume=0.4)
                 bullet.remove_from_sprite_lists()
                 for projectile in projectiles_hit_list:
                     self.destroy_projectile(projectile)
@@ -126,6 +130,7 @@ class GameView(arcade.View):
             if not self.invulnerable:
                 self.lives -= 1
                 self.player_list.append(self.shield)
+                arcade.play_sound(self.hit_sound, volume=0.4)
                 arcade.schedule(self.invulnerability_toggle, self.invulnerability_time)
                 self.invulnerable = True
             for projectile in ship_hit_list:
@@ -161,6 +166,7 @@ class GameView(arcade.View):
         if button == arcade.MOUSE_BUTTON_LEFT and self.can_shoot:
             self.bullets_list.append(Bullet(self.ship.center_x, self.ship.center_y, x, y, 650,
                                             self.window.width, self.window.height))
+            arcade.play_sound(self.pew_sound, volume=0.4)
             self.can_shoot = False
             arcade.schedule(self.weapon_ready, self.shoot_cooldown)
 
