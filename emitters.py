@@ -1,7 +1,7 @@
 import random
 import arcade
 
-from arcade.particles import FadeParticle, Emitter, EmitBurst, EmitInterval, EmitMaintainCount
+from arcade.particles import FadeParticle, Emitter, EmitMaintainCount
 
 SPARK_TEX = [
     arcade.make_soft_circle_texture(8, arcade.color.PASTEL_YELLOW),
@@ -22,7 +22,7 @@ def make_trail(attached_sprite, maintain=60):
             change_xy=arcade.math.rand_in_circle((0.0, 0.0), 1.6),
             lifetime=random.uniform(0.35, 0.6),
             start_alpha=220, end_alpha=0,
-            scale=random.uniform(0.25, 0.4),
+            scale=random.uniform(0.8, 1.1),
         ),
     )
 

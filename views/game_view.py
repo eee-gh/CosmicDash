@@ -4,6 +4,7 @@ import random
 from pyglet.graphics import Batch
 from player import Ship, Bullet, ShipHitbox, Shield
 from projectiles import ProjectileA, ProjectileB
+from emitters import make_trail
 
 
 class GameView(arcade.View):
@@ -37,11 +38,13 @@ class GameView(arcade.View):
         self.dash_use_cd = 0.01
         self.dash_refill_cd = 0.05
         arcade.schedule(self.dash_refill, self.dash_refill_cd)
-        self.projectile_cd = 1
-        self.projectile_amo = 7
+        self.projectile_cd = 2
+        self.projectile_amo = 3
         self.projectile_b_rate = 30
         arcade.schedule(self.spawn_projectiles, self.projectile_cd)
         self.emitters = []
+        self.trail = make_trail(self.ship)
+        self.emitters.append(self.trail)
 
         self.batch = Batch()
         self.dash_cd = arcade.Text(str(self.dash_cooldown // 10 * 10) + '%', 0, self.window.height / 12 * 11,
@@ -57,6 +60,10 @@ class GameView(arcade.View):
     def on_draw(self):
         self.clear()
         self.star_list.draw()
+
+        if self.is_dashing:
+            for e in self.emitters:
+                e.draw()
 
         self.bullets_list.draw()
         self.player_list.draw()
@@ -100,6 +107,13 @@ class GameView(arcade.View):
         self.bullets_list.update(delta_time)
         self.projectile_list.update(delta_time)
 
+        new_projectile_cd = max(0.8, 2 - 0.1 * (self.time // 10))
+        if self.projectile_cd != new_projectile_cd:
+            self.projectile_cd = new_projectile_cd
+            arcade.unschedule(self.spawn_projectiles)
+            arcade.schedule(self.spawn_projectiles, self.projectile_cd)
+        self.projectile_amo = min(8, 3 + (self.time // 20))
+
         for bullet in self.bullets_list:
             projectiles_hit_list = arcade.check_for_collision_with_list(bullet, self.projectile_list_b)
             if projectiles_hit_list:
@@ -122,6 +136,9 @@ class GameView(arcade.View):
             if star.center_y < -8:
                 star.center_y = self.window.height + 8
 
+        self.trail.center_x = self.ship.center_x
+        self.trail.center_y = self.ship.center_y
+
         emitters_copy = self.emitters.copy()
         for e in emitters_copy:
             e.update(delta_time)
@@ -131,7 +148,7 @@ class GameView(arcade.View):
 
     def on_key_press(self, key, modifiers):
         self.keys_pressed.add(key)
-        if key == arcade.key.ESCAPE:
+        if key == arcade.key.ESCAPE and not self.ship.dead and not self.paused:
             pause_view = self.window.view_dict['pause_view'](self)
             self.paused = True
             self.window.show_view(pause_view)
@@ -199,17 +216,17 @@ class GameView(arcade.View):
 
         for i in range(self.projectile_amo):
             n = random.randint(1, 100)
-            p_x = self.ship.center_x + random.randint(-200, 200)
 
+            p_x = self.ship.center_x + random.randint(-250, 250)
             if p_x > self.window.width:
-                p_x = self.window.width
+                p_x = p_x - self.window.width
             elif p_x < 0:
-                p_x = 0
-            p_y = self.ship.center_y + random.randint(-200, 200)
+                p_x = self.window.width + p_x
+            p_y = self.ship.center_y + random.randint(-250, 250)
             if p_y > self.window.width:
-                p_y = self.window.width
+                p_y = p_y - self.window.width
             elif p_y < 0:
-                p_y = 0
+                p_y = self.window.width + p_y
 
             if n > self.projectile_b_rate:
                 projectile = ProjectileA(random.randint(-200, self.window.width + 200), self.window.height + 200,

@@ -1,9 +1,8 @@
 import arcade
 
 from pyglet.graphics import Batch
-from arcade.gui import UIManager, UIFlatButton, UITextureButton, UILabel, UIInputText, UITextArea, UISlider, UIDropdown, \
-    UIMessageBox
-from arcade.gui.widgets.layout import UIAnchorLayout, UIBoxLayout
+from arcade.gui import UIManager, UIFlatButton
+from arcade.gui.widgets.layout import UIAnchorLayout
 
 
 class EndView(arcade.View):
@@ -16,6 +15,7 @@ class EndView(arcade.View):
         self.time = game_view.time
         self.score = game_view.score
         self.alph = [chr(i) for i in range(ord('A'), ord('Z') + 1)]
+        self.record_saved = False
         self.c1, self.c2, self.c3 = 0, 0, 0
         self.name = self.alph[self.c1] + self.alph[self.c2] + self.alph[self.c3]
 
@@ -93,6 +93,18 @@ class EndView(arcade.View):
         down3.on_click = lambda event: self.change_name(3, False)
         self.anchor_layout.add(down3, align_x=86, align_y=-80)
 
+        save_rec = UIFlatButton(text='SAVE', width=120, height=120, color=arcade.color.BLUE)
+        save_rec.on_click = lambda event: self.save_record(save_rec)
+        self.anchor_layout.add(save_rec, align_x=250, align_y=-5)
+
+        restart_btn = UIFlatButton(text='TRY AGAIN', width=300, height=70, color=arcade.color.BLUE)
+        restart_btn.on_click = lambda event: self.restart()
+        self.anchor_layout.add(restart_btn, align_x=0, align_y=-180)
+
+        quit_btn = UIFlatButton(text='MAIN MENU', width=300, height=70, color=arcade.color.BLUE)
+        quit_btn.on_click = lambda event: self.quit_m()
+        self.anchor_layout.add(quit_btn, align_x=0, align_y=-270)
+
     def change_name(self, n, d):
         a = 1 if d else -1
 
@@ -114,3 +126,21 @@ class EndView(arcade.View):
                 self.c3 = len(self.alph) + self.c3
             elif self.c3 > len(self.alph) - 1:
                 self.c3 = self.c2 % len(self.alph)
+
+    def save_record(self, btn):
+        if self.record_saved:
+            return
+        self.window.db_manager.add_record(self.alph[self.c1] + self.alph[self.c2] + self.alph[self.c3],
+                                          self.time, self.score)
+        self.record_saved = True
+        btn.text = 'SAVED!'
+
+    def restart(self):
+        game_view = self.window.view_dict['game_view'](self.game_view.star_list)
+        self.window.show_view(game_view)
+        self.manager.disable()
+
+    def quit_m(self):
+        menu_view = self.window.view_dict['menu_view']()
+        self.window.show_view(menu_view)
+        self.manager.disable()

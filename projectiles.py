@@ -1,10 +1,14 @@
 import arcade
 import math
+import random
 
 
 class ProjectileA(arcade.Sprite):
     def __init__(self, start_x, start_y, end_x, end_y, speed, sw, sh):
-        texture = arcade.make_soft_square_texture(50, arcade.color.RED, 255)
+        if random.random() < 0.4:
+            texture = arcade.make_soft_square_texture(random.randint(40, 90), arcade.color.RED, 255)
+        else:
+            texture = arcade.make_soft_circle_texture(random.randint(40, 90), arcade.color.RED, 255)
         super().__init__(texture)
         self.center_x = start_x
         self.center_y = start_y
@@ -28,7 +32,10 @@ class ProjectileA(arcade.Sprite):
 
 class ProjectileB(arcade.Sprite):
     def __init__(self, start_x, start_y, end_x, end_y, speed, sw, sh):
-        texture = arcade.make_soft_square_texture(50, arcade.color.GREEN, 255)
+        if random.random() < 0.6:
+            texture = arcade.make_soft_square_texture(random.randint(40, 90), arcade.color.GREEN, 255)
+        else:
+            texture = arcade.make_soft_circle_texture(random.randint(40, 90), arcade.color.GREEN, 255)
         super().__init__(texture)
         self.center_x = start_x
         self.center_y = start_y
